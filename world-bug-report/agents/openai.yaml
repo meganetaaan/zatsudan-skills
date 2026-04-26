@@ -1,0 +1,4 @@
+interface:
+  display_name: "現実バグ報告"
+  short_description: "日常のしょうもない現象を、真面目なバグ報告にする。"
+  default_prompt: "今日の現実バグを報告してください。"

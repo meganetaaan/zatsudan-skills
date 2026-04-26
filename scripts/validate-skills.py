@@ -61,6 +61,18 @@ def validate_skill(skill_dir: Path) -> None:
         if payload["words"][0] != "test" or len(payload["words"]) != 3:
             fail(f"{random_words}: invalid random word output")
 
+    random_topic = skill_dir / "scripts" / "random-topic.mjs"
+    if random_topic.exists():
+        result = subprocess.run(
+            ["node", str(random_topic)],
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+        )
+        payload = json.loads(result.stdout)
+        if not payload.get("topic"):
+            fail(f"{random_topic}: invalid random topic output")
+
     word_pool = skill_dir / "references" / "word-pool.json"
     if word_pool.exists():
         payload = json.loads(word_pool.read_text())

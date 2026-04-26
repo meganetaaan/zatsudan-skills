@@ -26,13 +26,56 @@
 
 この場合、`スマホ` を1語目として固定し、残り2語を `uso-zatsugaku/references/word-pool.json` から抽出します。
 
+### world-bug-report
+
+日常のしょうもない現象を、真面目なバグ報告として起票します。
+
+通常出力:
+
+```markdown
+現実バグ報告
+
+概要: ...
+影響度: ...
+再現手順: ...
+期待結果: ...
+実際結果: ...
+```
+
+例:
+
+```text
+傘のバグ
+```
+
+### micro-conspiracy
+
+日常の小さな現象に、無駄に疑わしい陰謀論を作ります。
+
+通常出力:
+
+```markdown
+小規模陰謀論
+
+対象: ...
+主張: ...
+黒幕: ...
+証拠: ...
+```
+
+例:
+
+```text
+リモコンの陰謀
+```
+
 ## Install
 
 Codex が読む skills ディレクトリにコピーします。
 
 ```bash
 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R uso-zatsugaku "${CODEX_HOME:-$HOME/.codex}/skills/"
+cp -R uso-zatsugaku world-bug-report micro-conspiracy "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```
 
 ## Validate
@@ -40,6 +83,8 @@ cp -R uso-zatsugaku "${CODEX_HOME:-$HOME/.codex}/skills/"
 ```bash
 python3 scripts/validate-skills.py
 node uso-zatsugaku/scripts/random-words.mjs --count 3 --theme スマホ
+node world-bug-report/scripts/random-topic.mjs
+node micro-conspiracy/scripts/random-topic.mjs
 ```
 
 ## Word Pool

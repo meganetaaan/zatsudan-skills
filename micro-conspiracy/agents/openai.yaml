@@ -1,0 +1,4 @@
+interface:
+  display_name: "小規模陰謀論"
+  short_description: "日常の小さな現象に、無駄に疑わしい陰謀論を作る。"
+  default_prompt: "小さすぎる陰謀論をひとつ作ってください。"
