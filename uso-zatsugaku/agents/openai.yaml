@@ -1,0 +1,4 @@
+interface:
+  display_name: "3語嘘雑学"
+  short_description: "ローカル単語プールの3語から、それっぽい嘘雑学を生成する。"
+  default_prompt: "ランダムな3語をお題に、嘘雑学の候補、推敲、トップ3を作成してください。"
