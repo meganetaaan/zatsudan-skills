@@ -1,32 +1,15 @@
 #!/usr/bin/env node
 
-const topics = [
-  "リモコン",
-  "消しゴム",
-  "自販機",
-  "スマホ",
-  "イヤホン",
-  "靴下",
-  "レシート",
-  "冷蔵庫",
-  "カーテン",
-  "エレベーター",
-  "傘",
-  "ペン",
-  "ノート",
-  "カバン",
-  "コップ",
-  "充電ケーブル",
-  "ふせん",
-  "玄関マット",
-  "机の引き出し",
-  "冷凍庫",
-  "洗濯ばさみ",
-  "キーホルダー",
-  "スリッパ",
-  "カレンダー",
-  "紙袋",
-];
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const topic = topics[Math.floor(Math.random() * topics.length)];
-console.log(JSON.stringify({ topic }, null, 2));
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const defaultBag = path.join(scriptDir, "..", "references", "topics.json");
+
+const bagPath = process.argv[2] ?? defaultBag;
+const payload = JSON.parse(fs.readFileSync(bagPath, "utf8"));
+const topics = payload.topics;
+const item = topics[Math.floor(Math.random() * topics.length)];
+
+console.log(JSON.stringify(item, null, 2));

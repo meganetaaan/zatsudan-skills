@@ -29,6 +29,7 @@
 ### world-bug-report
 
 日常のしょうもない現象を、真面目なバグ報告として起票します。
+入力がない場合は `world-bug-report/references/topics.json` から題材を選びます。
 
 通常出力:
 
@@ -51,6 +52,7 @@
 ### micro-conspiracy
 
 日常の小さな現象に、無駄に疑わしい陰謀論を作ります。
+入力がない場合は `micro-conspiracy/references/topics.json` から題材を選びます。
 
 通常出力:
 
@@ -86,6 +88,8 @@ node uso-zatsugaku/scripts/random-words.mjs --count 3 --theme スマホ
 node world-bug-report/scripts/random-topic.mjs
 node micro-conspiracy/scripts/random-topic.mjs
 ```
+
+`world-bug-report` と `micro-conspiracy` は、同じ構造の topic bag を各 skill の `references/topics.json` に持ちます。
 
 ## Word Pool
 
