@@ -33,12 +33,17 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - run: npm run deploy -- --dry-run
 
   deploy:
     # main への push のときだけデプロイ（PR ではデプロイしない）。
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: check
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      ZATSUDAN_API_KEY: ${{ secrets.ZATSUDAN_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -47,16 +52,7 @@ jobs:
           cache: npm
           cache-dependency-path: zatsudan-mcp/package-lock.json
       - run: npm ci
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: zatsudan-mcp
-          command: deploy
-          # Worker 側の Bearer token を secret として同期する。
-          # ZATSUDAN_API_KEY を未設定にすれば認証なしでデプロイされる。
-          secrets: |
-            ZATSUDAN_API_KEY
-        env:
-          ZATSUDAN_API_KEY: ${{ secrets.ZATSUDAN_API_KEY }}
+      - name: Sync Worker API key secret
+        if: env.ZATSUDAN_API_KEY != ''
+        run: printf '%s' "$ZATSUDAN_API_KEY" | npx wrangler secret put ZATSUDAN_API_KEY
+      - run: npm run deploy
