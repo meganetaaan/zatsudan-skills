@@ -62,11 +62,31 @@ ZATSUDAN_API_KEY=local-dev-key
 
 ## デプロイ
 
+手動デプロイ:
+
 ```bash
 npm run deploy     # wrangler deploy
 ```
 
 Workers AI binding は `wrangler.jsonc` の `ai.binding` で有効化済みです。
+
+### CI/CD（GitHub Actions）
+
+`.github/workflows/zatsudan-mcp.yml` で自動化しています。
+
+- **check**（push / PR）: `npm ci` → `npm run typecheck` → `npm test`
+- **deploy**（`main` への push のみ）: check 成功後に `wrangler deploy`
+
+`zatsudan-mcp/**` に変更があったときだけ起動します。
+
+デプロイには以下の **リポジトリ Secrets** を設定してください
+（Settings → Secrets and variables → Actions）。
+
+| Secret | 必須 | 用途 |
+| --- | --- | --- |
+| `CLOUDFLARE_API_TOKEN` | ✅ | Workers デプロイ用 API トークン（`Edit Cloudflare Workers` 権限） |
+| `CLOUDFLARE_ACCOUNT_ID` | 任意 | 複数アカウント所属時に指定 |
+| `ZATSUDAN_API_KEY` | 任意 | Worker 側の Bearer token。デプロイ時に `wrangler secret` へ同期される。未設定なら認証なしでデプロイ |
 
 ## API key の設定
 
