@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "zatsudan-mcp",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "ai": {
+    "binding": "AI"
+  },
+  "vars": {
+    // Local dev では空のままで認証なし。
+    // 本番では `wrangler secret put ZATSUDAN_API_KEY` で上書きする。
+    "ZATSUDAN_API_KEY": ""
+  },
+  "observability": {
+    "enabled": true
+  }
+}
