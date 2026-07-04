@@ -4,21 +4,25 @@ on:
   push:
     branches: [main]
     paths:
-      - "zatsudan-mcp/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "wrangler.toml"
       - ".github/workflows/zatsudan-mcp.yml"
   pull_request:
     paths:
-      - "zatsudan-mcp/**"
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "wrangler.toml"
       - ".github/workflows/zatsudan-mcp.yml"
 
 # 同一ブランチの多重実行を抑止（デプロイの競合防止）。
 concurrency:
   group: zatsudan-mcp-${{ github.ref }}
   cancel-in-progress: false
-
-defaults:
-  run:
-    working-directory: zatsudan-mcp
 
 jobs:
   check:
@@ -29,10 +33,9 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: zatsudan-mcp/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
       - run: npm run typecheck
-      - run: npm test
       - run: npm run deploy -- --dry-run
 
   deploy:
@@ -42,17 +45,12 @@ jobs:
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      ZATSUDAN_API_KEY: ${{ secrets.ZATSUDAN_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: npm
-          cache-dependency-path: zatsudan-mcp/package-lock.json
+          cache-dependency-path: package-lock.json
       - run: npm ci
-      - name: Sync Worker API key secret
-        if: env.ZATSUDAN_API_KEY != ''
-        run: printf '%s' "$ZATSUDAN_API_KEY" | npx wrangler secret put ZATSUDAN_API_KEY
       - run: npm run deploy
