@@ -4,6 +4,8 @@ node_modules/
 .venv/
 __pycache__/
 *.pyc
+.wrangler/
+.dev.vars
 
 # Local source data used when regenerating word pools.
 **/references/words.json

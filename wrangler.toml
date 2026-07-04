@@ -1,0 +1,19 @@
+name = "zatsudan-skills-mcp"
+main = "src/index.ts"
+compatibility_date = "2025-06-15"
+workers_dev = true
+minify = true
+routes = [
+  { pattern = "zatsudan-mcp.meganetaaan.com", custom_domain = true }
+]
+
+[ai]
+binding = "AI"
+
+[observability]
+enabled = true
+
+[vars]
+# Comma-separated origins allowed to call /mcp from browsers.
+# Requests without an Origin header, such as most MCP desktop clients, are allowed.
+ALLOWED_ORIGINS = "https://playground.ai.cloudflare.com,https://zatsudan-mcp.meganetaaan.com,http://localhost:5173,http://127.0.0.1:5173"
