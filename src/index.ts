@@ -339,44 +339,13 @@ async function usoZatsugaku(env: Bindings, args: Record<string, unknown>): Promi
       skill: "uso-zatsugaku",
       words,
       debug,
-      result: text,
     },
   };
 }
 
 async function worldBugReport(env: Bindings, args: Record<string, unknown>): Promise<ToolResult> {
   const topic = cleanText(readOptionalString(args, "topic")) ?? pick(worldTopics.topics).topic;
-  const prompt = buildWorldBugReportPromptForPrompt(topic);
-  const text = await generateText(env, prompt, 384).catch(() => fallbackWorldBugReport(topic));
-
-  return {
-    content: [{ type: "text", text }],
-    structuredContent: {
-      skill: "world-bug-report",
-      topic,
-      result: text,
-    },
-  };
-}
-
-async function microConspiracy(env: Bindings, args: Record<string, unknown>): Promise<ToolResult> {
-  const topic = cleanText(readOptionalString(args, "topic")) ?? pick(microTopics.topics).topic;
-  const prompt = buildMicroConspiracyPromptForPrompt(topic);
-  const text = await generateText(env, prompt, 320).catch(() => fallbackMicroConspiracy(topic));
-
-  return {
-    content: [{ type: "text", text }],
-    structuredContent: {
-      skill: "micro-conspiracy",
-      topic,
-      result: text,
-    },
-  };
-}
-
-function buildWorldBugReportPromptForPrompt(topic: string | undefined): string {
-  const resolvedTopic = topic ?? pick(worldTopics.topics).topic;
-  return `「${resolvedTopic}」を題材に、日常のしょうもない現象を真面目なバグ報告として日本語で書いてください。
+  const prompt = `「${topic}」を題材に、日常のしょうもない現象を真面目なバグ報告として日本語で書いてください。
 
 出力は次の形式だけにしてください。
 
@@ -389,11 +358,20 @@ function buildWorldBugReportPromptForPrompt(topic: string | undefined): string {
 実際結果: ...
 
 各フィールドは短い一文。再現手順は2-3ステップを「 → 」でつなぐ。トリガーは、普通のあるあるより少し変な条件にしてください。実在人物、実在企業、政治、医療、災害、犯罪、差別、安全・法律・金融助言は避けてください。`;
+  const text = await generateText(env, prompt, 384).catch(() => fallbackWorldBugReport(topic));
+
+  return {
+    content: [{ type: "text", text }],
+    structuredContent: {
+      skill: "world-bug-report",
+      topic,
+    },
+  };
 }
 
-function buildMicroConspiracyPromptForPrompt(topic: string | undefined): string {
-  const resolvedTopic = topic ?? pick(microTopics.topics).topic;
-  return `「${resolvedTopic}」を題材に、日常の小さな現象へ無害で小さすぎる陰謀論を作ってください。
+async function microConspiracy(env: Bindings, args: Record<string, unknown>): Promise<ToolResult> {
+  const topic = cleanText(readOptionalString(args, "topic")) ?? pick(microTopics.topics).topic;
+  const prompt = `「${topic}」を題材に、日常の小さな現象へ無害で小さすぎる陰謀論を作ってください。
 
 出力は次の形式だけにしてください。
 
@@ -406,6 +384,15 @@ function buildMicroConspiracyPromptForPrompt(topic: string | undefined): string 
 証拠: ...
 
 全体を5行程度に収める。黒幕は、物、部屋、習慣、または明らかに架空で無害な団体にしてください。実在人物、実在企業、実在組織、政治、医療、災害、犯罪、差別、安全・法律・金融助言は避けてください。`;
+  const text = await generateText(env, prompt, 320).catch(() => fallbackMicroConspiracy(topic));
+
+  return {
+    content: [{ type: "text", text }],
+    structuredContent: {
+      skill: "micro-conspiracy",
+      topic,
+    },
+  };
 }
 
 function fallbackWorldBugReport(topic: string): string {
