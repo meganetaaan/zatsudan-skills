@@ -1,12 +1,14 @@
 import type { Env } from "../env";
 
 /**
- * 使用する Workers AI モデル。無料枠で使える軽量な instruct モデルを既定にする。
+ * 使用する Workers AI モデル。雑談の日本語品質を優先し、Llama 3.3 70B（fp8-fast 量子化）を既定にする。
+ * 旧既定の `@cf/meta/llama-3.1-8b-instruct` は Deprecated のため乗り換え済み。
+ * 8B より Neuron 消費は大きい点に注意（無料枠を超えやすい）。
  * 別モデルへ差し替える場合はここだけ変更すればよい。
  */
-export const TEXT_MODEL = "@cf/meta/llama-3.1-8b-instruct" as const;
+export const TEXT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as const;
 
-/** 雑談用途なので短文生成に寄せる。無料枠のトークン消費を抑えるため上限は低め。 */
+/** 雑談用途なので短文生成に寄せる。トークン消費を抑えるため上限は低め。 */
 export const DEFAULT_MAX_TOKENS = 384;
 export const MAX_ALLOWED_TOKENS = 512;
 
@@ -28,11 +30,17 @@ export async function runTextGeneration(
 ): Promise<string> {
   const maxTokens = clampTokens(options?.maxTokens ?? DEFAULT_MAX_TOKENS);
 
+  // instruct/chat モデルには `prompt`（補完）ではなく `messages`（チャット）で渡す。
+  // 補完形式だと賢いモデルほど指示文ごと継続・エコーしてしまうため、
+  // 指示・材料は system ロールに置き、user ロールは生成トリガのみにする。
   const raw = (await env.AI.run(TEXT_MODEL, {
-    prompt,
+    messages: [
+      { role: "system", content: prompt },
+      { role: "user", content: "上記の指示に従い、本文だけを出力してください。" },
+    ],
     max_tokens: maxTokens,
-    // 雑談なので多少のばらつきを持たせつつ暴走しない程度に。
-    temperature: 0.8,
+    // 雑談なので多少のばらつきは残しつつ、70B での外国語トークン混入を抑えるため控えめに。
+    temperature: 0.6,
   })) as unknown;
 
   const text = extractText(raw);
