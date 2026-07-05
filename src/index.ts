@@ -53,7 +53,7 @@ type TextGenerationOptions = {
   maxTokens?: number;
 };
 
-const TEXT_MODEL = "@cf/meta/llama-3.1-8b-instruct" as const;
+const TEXT_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast" as const;
 const DEFAULT_MAX_TOKENS = 384;
 const MAX_ALLOWED_TOKENS = 512;
 
@@ -476,10 +476,16 @@ async function generateText(env: Bindings, prompt: string, maxTokens?: number): 
   }
 
   const clamped = clampTokens(maxTokens ?? DEFAULT_MAX_TOKENS);
+  // instruct/chat モデルには `prompt`（補完）ではなく `messages`（チャット）で渡す。
+  // 補完形式だと賢いモデルほど指示文ごと継続・エコーしてしまうため、
+  // 指示・材料は system ロールに置き、user ロールは生成トリガのみにする。
   const raw = (await env.AI.run(TEXT_MODEL, {
-    prompt,
+    messages: [
+      { role: "system", content: prompt },
+      { role: "user", content: "上記の指示に従い、本文だけを出力してください。" },
+    ],
     max_tokens: clamped,
-    temperature: 0.8,
+    temperature: 0.6,
   })) as unknown;
 
   const text = extractText(raw);
